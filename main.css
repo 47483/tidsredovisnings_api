@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@600&display=swap');
+
+* {
+    font-family: 'Raleway', sans-serif;
+}
+
+table, tr, th, td {
+    border: 0.1em solid black;
+    border-collapse: collapse;
+}
+
+th, td {
+    width:20vw;
+    padding:0.5em;
+}
+
+.indent {
+    text-indent:1em;
+}
+
+.indentTwo {
+    text-indent:2em;
+}
