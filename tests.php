@@ -78,6 +78,7 @@
             fd.append("testing",true);
 
             fd.append("user","testUser");
+            fd.append("id",51)
             fetchTest("Missing login parameters","http://localhost/javascript/toDo/api/activity",fd,0,TA2);
 
             fd = new FormData();
@@ -86,6 +87,14 @@
             fd.append("user","testUser");
             fd.append("password","apiTestingPWD");
             fetchTest("Missing 'id' parameter","http://localhost/javascript/toDo/api/activity",fd,0,TA2);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("id",-51)
+            fd.append("password","apiTestingPWD");
+            fetchTest("Using wrong 'id' parameter","http://localhost/javascript/toDo/api/activity",fd,0,TA2);
 
             fd = new FormData();
             fd.append("testing",true);
@@ -117,6 +126,30 @@
             fd.append("from","1980-11-10 00:00:00");
             fd.append("to","1985-11-10 00:00:00");
             fetchTest("Using all correct parameters","http://localhost/javascript/toDo/api/activity",fd,1,TA3);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","add");
+            fd.append("category","NotDefault");
+            fd.append("comment","A comment.");
+            fd.append("from","1980-11-10 00:00:00");
+            fd.append("to","1985-11-10 00:00:00");
+            fetchTest("Using non-existent category","http://localhost/javascript/toDo/api/activity",fd,0,TA3);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","add");
+            fd.append("category","Default");
+            fd.append("comment","A comment.");
+            fd.append("from","1990-11-10 00:00:00");
+            fd.append("to","1985-11-10 00:00:00");
+            fetchTest("Using invalid from/to","http://localhost/javascript/toDo/api/activity",fd,0,TA3);
 
             fd = new FormData();
             fd.append("testing",true);
@@ -220,6 +253,34 @@
             fd.append("testing",true);
 
             fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","edit");
+            fd.append("id",51);
+            fd.append("status",0);
+            fd.append("category","NotDefault");
+            fd.append("comment","A comment.");
+            fd.append("from","1980-11-10 00:00:00");
+            fd.append("to","1985-11-10 00:00:00");
+            fetchTest("Using non-existent category","http://localhost/javascript/toDo/api/activity",fd,0,TA4);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","edit");
+            fd.append("id",51);
+            fd.append("status",0);
+            fd.append("category","Default");
+            fd.append("comment","A comment.");
+            fd.append("from","1990-11-10 00:00:00");
+            fd.append("to","1985-11-10 00:00:00");
+            fetchTest("Using invalid from/to parameters","http://localhost/javascript/toDo/api/activity",fd,0,TA4);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
             fd.append("mode","edit");
             fd.append("id",51);
             fd.append("status",0);
@@ -241,6 +302,20 @@
             fd.append("from","1980-11-10 00:00:00");
             fd.append("to","1985-11-10 00:00:00");
             fetchTest("Missing 'id' parameter","http://localhost/javascript/toDo/api/activity",fd,0,TA4);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","edit");
+            fd.append("id",-51);
+            fd.append("status",0);
+            fd.append("category","Default");
+            fd.append("comment","A comment.");
+            fd.append("from","1980-11-10 00:00:00");
+            fd.append("to","1985-11-10 00:00:00");
+            fetchTest("Using wrong 'id' parameter","http://localhost/javascript/toDo/api/activity",fd,1,TA4);
 
             fd = new FormData();
             fd.append("testing",true);
@@ -374,6 +449,16 @@
             fd.append("user","testUser");
             fd.append("password","apiTestingPWD");
             fd.append("mode","status");
+            fd.append("id",-51);
+            fd.append("status",0);
+            fetchTest("Using wrong 'id' parameter","http://localhost/javascript/toDo/api/activity",fd,1,TA5);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","status");
             fd.append("id",51);
             fetchTest("Missing 'status' parameter","http://localhost/javascript/toDo/api/activity",fd,0,TA5);
 
@@ -396,6 +481,61 @@
             fd.append("id",51);
             fd.append("status",0)
             fetchTest("Using wrong password","http://localhost/javascript/toDo/api/activity",fd,0,TA5);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            let TA6 = document.createElement("div");
+            TA6.innerHTML = "Remove Activity";
+            TA6.classList = "test";
+            document.body.appendChild(TA6);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","remove");
+            fd.append("id",51);
+            fetchTest("Using all correct parameters","http://localhost/javascript/toDo/api/activity",fd,1,TA6);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("mode","remove");
+            fd.append("id",51);
+            fetchTest("Missing login parameters","http://localhost/javascript/toDo/api/activity",fd,0,TA6);
+
+            fd.append("user","testUserWrong");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","remove");
+            fd.append("id",51);
+            fetchTest("Using wrong username","http://localhost/javascript/toDo/api/activity",fd,0,TA6);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWDWrong");
+            fd.append("mode","remove");
+            fd.append("id",51);
+            fetchTest("Using wrong password","http://localhost/javascript/toDo/api/activity",fd,0,TA6);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","remove");
+            fetchTest("Missing 'id' parameter","http://localhost/javascript/toDo/api/activity",fd,0,TA6);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","remove");
+            fd.append("id",-51);
+            fetchTest("Using wrong 'id' parameter","http://localhost/javascript/toDo/api/activity",fd,1,TA6);
+
         }
 
         function testCategories() {
@@ -457,6 +597,14 @@
             fd.append("user","testUser");
             fd.append("password","apiTestingPWD");
             fetchTest("Missing 'id' parameter","http://localhost/javascript/toDo/api/category",fd,0,TC2);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("id",-36);
+            fetchTest("Using wrong 'id' parameter","http://localhost/javascript/toDo/api/category",fd,0,TC2);
 
             fd = new FormData();
             fd.append("testing",true);
@@ -587,6 +735,16 @@
             fd = new FormData();
             fd.append("testing",true);
 
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","edit");
+            fd.append("category","A Category");
+            fd.append("id",-36);
+            fetchTest("Using wrong 'id' parameter","http://localhost/javascript/toDo/api/category",fd,1,TC4);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
             let TC5 = document.createElement("div");
             TC5.innerHTML = "Remove Category";
             TC5.classList = "test";
@@ -631,6 +789,15 @@
             fd.append("password","apiTestingPWD");
             fd.append("mode","remove");
             fetchTest("Missing 'id' parameter","http://localhost/javascript/toDo/api/category",fd,0,TC5);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","remove");
+            fd.append("id",-36);
+            fetchTest("Using wrong 'id' parameter","http://localhost/javascript/toDo/api/category",fd,1,TC5);
         }
 
         function testCompilation() {
@@ -647,6 +814,15 @@
             fd.append("from","1985-10-08 00:00:00");
             fd.append("to","1985-10-09 00:00:00");
             fetchTest("Using all correct parameters","http://localhost/javascript/toDo/api/compilation",fd,1,TCO1);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("from","1990-10-08 00:00:00");
+            fd.append("to","1985-10-09 00:00:00");
+            fetchTest("Using invalid from/to parameters","http://localhost/javascript/toDo/api/compilation",fd,0,TCO1);
 
             fd = new FormData();
             fd.append("testing",true);

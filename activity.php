@@ -81,42 +81,70 @@
                         }
                     }
                 } else if ($_POST["mode"] == "add" && isset($_POST["category"]) && isset($_POST["from"]) && isset($_POST["to"])) {
-                    //Add a new activity and send result as json
-                    $stmt=$db->prepare('INSERT INTO `activities` (`activity`, `comment`, `user`, `starttime`, `endtime`, `status`) VALUES (:category, :comment, :user, :starttime, :endtime, :stat)');
-
                     $category = filter_var($_POST["category"],FILTER_SANITIZE_SPECIAL_CHARS);
-                    
-                    if (isset($_POST["comment"])) {
-                        $comment = filter_var($_POST["comment"],FILTER_SANITIZE_SPECIAL_CHARS);
-                    } else {
-                        $comment = "";
-                    }
 
-                    $from = filter_var($_POST["from"],FILTER_SANITIZE_SPECIAL_CHARS);
-                    $to = filter_var($_POST["to"],FILTER_SANITIZE_SPECIAL_CHARS);
-
-                    if ($stmt->execute(["category"=>$category, "comment"=>$comment, "user"=>$user, "starttime"=>$from, "endtime"=>$to, "stat"=>0])) {
-                        $msg = new stdClass();
-                        $msg->info = "Successfully added activity";
-
-                        if (isset($_POST["testing"])) {
-                            $db->rollBack();
-                            $msg = new stdClass();
-                            $msg->response = 1;
-                            $msg->message = "Operation was successful.";
-                            header("Content-Type:application/json; charset=UTF-8");
-                            echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-
+                    $stmt=$db->prepare('SELECT `id` FROM `categories` WHERE `user`=:user AND `category`=:category');
+                    $stmt->execute(["user"=>$user,"category"=>$category]);
+                    if ($row=$stmt->fetch()) {
+                        //Add a new activity and send result as json
+                        $stmt=$db->prepare('INSERT INTO `activities` (`activity`, `comment`, `user`, `starttime`, `endtime`, `status`) VALUES (:category, :comment, :user, :starttime, :endtime, :stat)');
+                        
+                        if (isset($_POST["comment"])) {
+                            $comment = filter_var($_POST["comment"],FILTER_SANITIZE_SPECIAL_CHARS);
                         } else {
-                            header("Content-Type:application/json; charset=UTF-8");
-                            echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                            $comment = "";
+                        }
+
+                        $from = filter_var($_POST["from"],FILTER_SANITIZE_SPECIAL_CHARS);
+                        $to = filter_var($_POST["to"],FILTER_SANITIZE_SPECIAL_CHARS);
+
+                        if ($to < $from) {
+                            if (isset($_POST["testing"])) {
+                                $msg = new stdClass();
+                                $msg->response = 0;
+                                $msg->message = "Endtime is earlier than starttime.";
+                                header("Content-Type:application/json; charset=UTF-8");
+                                echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+                            } else {
+                                header("HTTP/1.1 400 Bad Request; Content-Type:application/json; charset=UTF-8");
+                            }
+                        } else {
+                            if ($stmt->execute(["category"=>$category, "comment"=>$comment, "user"=>$user, "starttime"=>$from, "endtime"=>$to, "stat"=>0])) {
+                                $msg = new stdClass();
+                                $msg->info = "Successfully added activity";
+        
+                                if (isset($_POST["testing"])) {
+                                    $db->rollBack();
+                                    $msg = new stdClass();
+                                    $msg->response = 1;
+                                    $msg->message = "Operation was successful.";
+                                    header("Content-Type:application/json; charset=UTF-8");
+                                    echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        
+                                } else {
+                                    header("Content-Type:application/json; charset=UTF-8");
+                                    echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                                }
+                            } else {
+                                if (isset($_POST["testing"])) {
+                                    $db->rollBack();
+                                    $msg = new stdClass();
+                                    $msg->response = 0;
+                                    $msg->message = "Could not add new activity.";
+                                    header("Content-Type:application/json; charset=UTF-8");
+                                    echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        
+                                } else {
+                                    header("HTTP/1.1 400 Bad Request; Content-Type:application/json; charset=UTF-8");
+                                }
+                            }
                         }
                     } else {
                         if (isset($_POST["testing"])) {
-                            $db->rollBack();
                             $msg = new stdClass();
                             $msg->response = 0;
-                            $msg->message = "Could not add new activity.";
+                            $msg->message = "The category doesn't exist.";
                             header("Content-Type:application/json; charset=UTF-8");
                             echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
@@ -126,48 +154,76 @@
                     }
 
                 } else if ($_POST["mode"] == "edit" && isset($_POST["id"]) && isset($_POST["category"]) && isset($_POST["from"]) && isset($_POST["to"]) && isset($_POST["status"])) {
-                    //Change a activity and send result as json
-                    $stmt=$db->prepare('UPDATE `activities` SET `activity`=:category, `comment`=:comment, `user`=:user, `starttime`=:starttime, `endtime`=:endtime, `status`=:stat WHERE `user`=:user AND `id`=:id');
-
                     $category = filter_var($_POST["category"],FILTER_SANITIZE_SPECIAL_CHARS);
-                    
-                    if (isset($_POST["comment"])) {
-                        $comment = filter_var($_POST["comment"],FILTER_SANITIZE_SPECIAL_CHARS);
-                    } else {
-                        $comment = "";
-                    }
 
-                    $from = filter_var($_POST["from"],FILTER_SANITIZE_SPECIAL_CHARS);
-                    $to = filter_var($_POST["to"],FILTER_SANITIZE_SPECIAL_CHARS);
-
-                    $status = filter_var($_POST["status"],FILTER_SANITIZE_SPECIAL_CHARS);
-
-                    $id = filter_var($_POST["id"],FILTER_SANITIZE_SPECIAL_CHARS);
-
-                    if ($stmt->execute(["category"=>$category, "comment"=>$comment, "user"=>$user, "starttime"=>$from, "endtime"=>$to, "stat"=>$status, "id"=>$id])) {
-                        $msg = new stdClass();
-                        $msg->info = "Successfully updated activity";
-
-                        if (isset($_POST["testing"])) {
-                            $db->rollBack();
-                            $msg = new stdClass();
-                            $msg->response = 1;
-                            $msg->message = "Operation was successful.";
-                            header("Content-Type:application/json; charset=UTF-8");
-                            echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-
+                    $stmt=$db->prepare('SELECT `id` FROM `categories` WHERE `user`=:user AND `category`=:category');
+                    $stmt->execute(["user"=>$user,"category"=>$category]);
+                    if ($row=$stmt->fetch()) {
+                        //Change a activity and send result as json
+                        $stmt=$db->prepare('UPDATE `activities` SET `activity`=:category, `comment`=:comment, `user`=:user, `starttime`=:starttime, `endtime`=:endtime, `status`=:stat WHERE `user`=:user AND `id`=:id');
+                        
+                        if (isset($_POST["comment"])) {
+                            $comment = filter_var($_POST["comment"],FILTER_SANITIZE_SPECIAL_CHARS);
                         } else {
-                            header("Content-Type:application/json; charset=UTF-8");
-                            echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                            $comment = "";
+                        }
+
+                        $from = filter_var($_POST["from"],FILTER_SANITIZE_SPECIAL_CHARS);
+                        $to = filter_var($_POST["to"],FILTER_SANITIZE_SPECIAL_CHARS);
+
+                        if ($to < $from) {
+                            if (isset($_POST["testing"])) {
+                                $msg = new stdClass();
+                                $msg->response = 0;
+                                $msg->message = "Endtime is earlier than starttime.";
+                                header("Content-Type:application/json; charset=UTF-8");
+                                echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+                            } else {
+                                header("HTTP/1.1 400 Bad Request; Content-Type:application/json; charset=UTF-8");
+                            }
+                        } else {
+                            $status = filter_var($_POST["status"],FILTER_SANITIZE_SPECIAL_CHARS);
+
+                            $id = filter_var($_POST["id"],FILTER_SANITIZE_SPECIAL_CHARS);
+        
+                            if ($stmt->execute(["category"=>$category, "comment"=>$comment, "user"=>$user, "starttime"=>$from, "endtime"=>$to, "stat"=>$status, "id"=>$id])) {
+                                $msg = new stdClass();
+                                $msg->info = "Successfully updated activity";
+        
+                                if (isset($_POST["testing"])) {
+                                    $db->rollBack();
+                                    $msg = new stdClass();
+                                    $msg->response = 1;
+                                    $msg->message = "Operation was successful.";
+                                    header("Content-Type:application/json; charset=UTF-8");
+                                    echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        
+                                } else {
+                                    header("Content-Type:application/json; charset=UTF-8");
+                                    echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                                }
+                            } else {
+                                if (isset($_POST["testing"])) {
+                                    $db->rollBack();
+                                    $msg = new stdClass();
+                                    $msg->response = 0;
+                                    $msg->message = "Could not change activity.";
+                                    header("Content-Type:application/json; charset=UTF-8");
+                                    echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                                } else {
+                                    header("HTTP/1.1 400 Bad Request; Content-Type:application/json; charset=UTF-8");
+                                }
+                            }
                         }
                     } else {
                         if (isset($_POST["testing"])) {
-                            $db->rollBack();
                             $msg = new stdClass();
                             $msg->response = 0;
-                            $msg->message = "Could not change activity.";
+                            $msg->message = "The category doesn't exist.";
                             header("Content-Type:application/json; charset=UTF-8");
                             echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                    
                         } else {
                             header("HTTP/1.1 400 Bad Request; Content-Type:application/json; charset=UTF-8");
                         }
