@@ -95,8 +95,28 @@
                             $comment = "";
                         }
 
-                        $from = filter_var($_POST["from"],FILTER_SANITIZE_SPECIAL_CHARS);
-                        $to = filter_var($_POST["to"],FILTER_SANITIZE_SPECIAL_CHARS);
+                        try {
+                            $from = new DateTime(filter_var($_POST["from"],FILTER_SANITIZE_SPECIAL_CHARS));
+                            $to = new DateTime(filter_var($_POST["to"],FILTER_SANITIZE_SPECIAL_CHARS));
+    
+                            $from = $from->format('Y-m-d H:i:s');
+                            $to = $to->format('Y-m-d H:i:s');
+                        }
+
+                        catch (Exception $e) {
+                            if (isset($_POST["testing"])) {
+                                $msg = new stdClass();
+                                $msg->response = 0;
+                                $msg->message = "Invalid date input.";
+                                header("Content-Type:application/json; charset=UTF-8");
+                                echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                                exit();
+    
+                            } else {
+                                header("HTTP/1.1 400 Bad Request; Content-Type:application/json; charset=UTF-8");
+                                exit();
+                            }
+                        }
 
                         if ($to < $from) {
                             if (isset($_POST["testing"])) {
@@ -154,6 +174,7 @@
                     }
 
                 } else if ($_POST["mode"] == "edit" && isset($_POST["id"]) && isset($_POST["category"]) && isset($_POST["from"]) && isset($_POST["to"]) && isset($_POST["status"])) {
+
                     $category = filter_var($_POST["category"],FILTER_SANITIZE_SPECIAL_CHARS);
 
                     $stmt=$db->prepare('SELECT `id` FROM `categories` WHERE `user`=:user AND `category`=:category');
@@ -168,8 +189,28 @@
                             $comment = "";
                         }
 
-                        $from = filter_var($_POST["from"],FILTER_SANITIZE_SPECIAL_CHARS);
-                        $to = filter_var($_POST["to"],FILTER_SANITIZE_SPECIAL_CHARS);
+                        try {
+                            $from = new DateTime(filter_var($_POST["from"],FILTER_SANITIZE_SPECIAL_CHARS));
+                            $to = new DateTime(filter_var($_POST["to"],FILTER_SANITIZE_SPECIAL_CHARS));
+    
+                            $from = $from->format('Y-m-d H:i:s');
+                            $to = $to->format('Y-m-d H:i:s');
+                        }
+
+                        catch (Exception $e) {
+                            if (isset($_POST["testing"])) {
+                                $msg = new stdClass();
+                                $msg->response = 0;
+                                $msg->message = "Invalid date input.";
+                                header("Content-Type:application/json; charset=UTF-8");
+                                echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                                exit();
+    
+                            } else {
+                                header("HTTP/1.1 400 Bad Request; Content-Type:application/json; charset=UTF-8");
+                                exit();
+                            }
+                        }
 
                         if ($to < $from) {
                             if (isset($_POST["testing"])) {

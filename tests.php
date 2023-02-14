@@ -133,6 +133,18 @@
             fd.append("user","testUser");
             fd.append("password","apiTestingPWD");
             fd.append("mode","add");
+            fd.append("category","Default");
+            fd.append("comment","A comment.");
+            fd.append("from","1980-11-10 00:00:00wrong");
+            fd.append("to","1985-11-10 00:00:00");
+            fetchTest("Using wrong format from/to","http://localhost/javascript/toDo/api/activity",fd,0,TA3);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","add");
             fd.append("category","NotDefault");
             fd.append("comment","A comment.");
             fd.append("from","1980-11-10 00:00:00");
@@ -248,6 +260,20 @@
             fd.append("from","1980-11-10 00:00:00");
             fd.append("to","1985-11-10 00:00:00");
             fetchTest("Using all correct parameters","http://localhost/javascript/toDo/api/activity",fd,1,TA4);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("mode","edit");
+            fd.append("id",51);
+            fd.append("status",0);
+            fd.append("category","Default");
+            fd.append("comment","A comment.");
+            fd.append("from","1980-11-10 00:00:00wrong");
+            fd.append("to","1985-11-10 00:00:00");
+            fetchTest("Using wrong format from/to","http://localhost/javascript/toDo/api/activity",fd,0,TA4);
 
             fd = new FormData();
             fd.append("testing",true);
@@ -817,6 +843,25 @@
 
             fd = new FormData();
             fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("from","1985-10-08 00:00:00wrong");
+            fd.append("to","1985-10-09 00:00:00");
+            fetchTest("Using wrong format from","http://localhost/javascript/toDo/api/compilation",fd,0,TCO1);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
+            fd.append("user","testUser");
+            fd.append("password","apiTestingPWD");
+            fd.append("from","1985-10-08 00:00:00");
+            fd.append("to","1985-10-09 00:00:00wrong");
+            fetchTest("Using wrong format to","http://localhost/javascript/toDo/api/compilation",fd,0,TCO1);
+
+            fd = new FormData();
+            fd.append("testing",true);
+
 
             fd.append("user","testUser");
             fd.append("password","apiTestingPWD");

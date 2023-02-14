@@ -8,14 +8,52 @@
 
         //Sanitize dates and fill them with default values if not provided.
         if (isset($_POST["from"])) {
-            $from = filter_var($_POST["from"],FILTER_SANITIZE_SPECIAL_CHARS);
+            try {
+                $from = new DateTime(filter_var($_POST["from"],FILTER_SANITIZE_SPECIAL_CHARS));
+
+                $from = $from->format('Y-m-d H:i:s');
+            }
+
+            catch (Exception $e) {
+                if (isset($_POST["testing"])) {
+                    $msg = new stdClass();
+                    $msg->response = 0;
+                    $msg->message = "Invalid from input.";
+                    header("Content-Type:application/json; charset=UTF-8");
+                    echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                    exit();
+
+                } else {
+                    header("HTTP/1.1 400 Bad Request; Content-Type:application/json; charset=UTF-8");
+                    exit();
+                }
+            }
         } else {
             $from = (new DateTime())->setTimestamp(0);
             $from = date_format($from,"Y-m-d H:i:s");
         }
 
         if (isset($_POST["to"])) {
-            $to = filter_var($_POST["to"],FILTER_SANITIZE_SPECIAL_CHARS);
+            try {
+                $to = new DateTime(filter_var($_POST["to"],FILTER_SANITIZE_SPECIAL_CHARS));
+
+                $to = $to->format('Y-m-d H:i:s');
+            }
+
+            catch (Exception $e) {
+                if (isset($_POST["testing"])) {
+                    $msg = new stdClass();
+                    $msg->response = 0;
+                    $msg->message = "Invalid to input.";
+                    header("Content-Type:application/json; charset=UTF-8");
+                    echo json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                    exit();
+
+                } else {
+                    header("HTTP/1.1 400 Bad Request; Content-Type:application/json; charset=UTF-8");
+                    exit();
+                }
+            }
         } else {
             $to = new DateTime("2970-01-01 00:00:00");
             $to = date_format($to,"Y-m-d H:i:s");
